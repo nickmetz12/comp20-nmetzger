@@ -13,10 +13,10 @@
         var type = "";
         var start = new google.maps.LatLng(0, 0);
         var myOptions = {
-            zoom: 13, 
+            zoom: 15, 
             center: start,
             mapTypeId: google.maps.MapTypeId.ROADMAP
-        }
+        };
         var map;
 
         function getNotUberData() {
@@ -25,7 +25,8 @@
                 navigator.geolocation.getCurrentPosition(function(position) {
                 myLat = position.coords.latitude;
                 myLong = position.coords.longitude;
-
+                
+                                
                 var xhr = new XMLHttpRequest();
     
                 xhr.open("POST", "https://defense-in-derpth.herokuapp.com/submit", true);
@@ -37,7 +38,7 @@
                     {
                         var els = JSON.parse(xhr.responseText);
                     
-                        init();
+                        init(myLat, myLong);
                         
                         if ('vehicles' in els) {
                             type = "vehicles";      
@@ -55,22 +56,35 @@
 
                 });}}
 
-        function init()
+        function init(Lat, Lng)
         {
             map = new google.maps.Map(document.getElementById("theMap"), myOptions);   
+            
+            var userLoc = new google.maps.LatLng(Lat, Lng); 
+            map.panTo(userLoc);
+
+            var marker = new google.maps.Marker({
+                    position: userLoc,
+                    title: "2zBf5CnB" 
+            });
+
+            marker.setMap(map);
+            var infowindow = new google.maps.InfoWindow();
+
+            google.maps.event.addListener(marker, "click", function() {
+            infowindow.setContent(this.title);
+            infowindow.open(map, this);});
         }
 
         function loadData(els)
         {
             for (i = 0; i < els[type].length; i++)
             {  
-                console.log(els[type][i]["username"]); 
                 var Lat = els[type][i]["lat"];
                 var Lng = els[type][i]["lng"];
 
                 var datapoint = new google.maps.LatLng(Lat, Lng); 
 
-                map.panTo(datapoint);
 
                 var marker = new google.maps.Marker({
                     position: datapoint,
@@ -80,8 +94,7 @@
                 marker.setMap(map);
                 var infowindow = new google.maps.InfoWindow();
 
-                google.maps.event.addListener(marker, 'click' , function() {
-                    console.log(this);
+                google.maps.event.addListener(marker, "click", function() {
                     infowindow.setContent(this.title);
                     infowindow.open(map, this);
                 });
@@ -93,7 +106,7 @@
 
 
 <body onload="getNotUberData()">
-    <div id="theMap">Hello, World!</div>
+    <div id="theMap"></div>
 
 </body>
 
