@@ -1,0 +1,100 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <title>Not Uber</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <script type="text/javascript" 
+         src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+    <link rel="stylesheet" href="notuber-style.css" />
+    <script>
+        
+        var type = "";
+        var start = new google.maps.LatLng(0, 0);
+        var myOptions = {
+            zoom: 13, 
+            center: start,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        var map;
+
+        function getNotUberData() {
+            if (navigator.geolocation)
+            {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                myLat = position.coords.latitude;
+                myLong = position.coords.longitude;
+
+                var xhr = new XMLHttpRequest();
+    
+                xhr.open("POST", "https://defense-in-derpth.herokuapp.com/submit", true);
+            
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200)
+                    {
+                        var els = JSON.parse(xhr.responseText);
+                    
+                        init();
+                        
+                        if ('vehicles' in els) {
+                            type = "vehicles";      
+                        } else if ('passengers' in els) {
+                            type = "passengers";
+                        }
+
+                        loadData(els);
+                    }
+                }
+            
+                params = "username=2zBf5CnB&lat=" + myLat + "&lng=" + myLong;
+             
+                xhr.send(params);
+
+                });}}
+
+        function init()
+        {
+            map = new google.maps.Map(document.getElementById("theMap"), myOptions);   
+        }
+
+        function loadData(els)
+        {
+            for (i = 0; i < els[type].length; i++)
+            {  
+                console.log(els[type][i]["username"]); 
+                var Lat = els[type][i]["lat"];
+                var Lng = els[type][i]["lng"];
+
+                var datapoint = new google.maps.LatLng(Lat, Lng); 
+
+                map.panTo(datapoint);
+
+                var marker = new google.maps.Marker({
+                    position: datapoint,
+                    title: els[type][i]["username"]
+                });
+
+                marker.setMap(map);
+                var infowindow = new google.maps.InfoWindow();
+
+                google.maps.event.addListener(marker, 'click' , function() {
+                    console.log(this);
+                    infowindow.setContent(this.title);
+                    infowindow.open(map, this);
+                });
+            }
+        }
+
+    </script>
+</head>
+
+
+<body onload="getNotUberData()">
+    <div id="theMap">Hello, World!</div>
+
+</body>
+
+</html>
