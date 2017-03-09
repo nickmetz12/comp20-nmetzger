@@ -11,6 +11,7 @@
     <script>
         
         var type = "";
+        var image;
         var start = new google.maps.LatLng(0, 0);
         var myOptions = {
             zoom: 15, 
@@ -42,8 +43,10 @@
                         
                         if ('vehicles' in els) {
                             type = "vehicles";      
+                            image = 'black_car.png'; 
                         } else if ('passengers' in els) {
                             type = "passengers";
+                            image = 'stickfigure.png';
                         }
 
                         loadData(els);
@@ -91,6 +94,7 @@
 
                 var marker = new google.maps.Marker({
                     position: datapoint,
+                    icon: image,
                     title: els[type][i]["username"]
                 });
 
