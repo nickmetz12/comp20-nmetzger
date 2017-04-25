@@ -1,4 +1,4 @@
-</!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -7,23 +7,48 @@
 
 <body>
 
-	<h1>Introduction</h1>
-	<p></p>
+	<h1>1. Introduction</h1>
+	<p>NotUber is a web application that provides a car service. Passengers and drivers area able to view each other on a map, with locations of passengers and cars shown depending on whether the user is a passenger or a driver. <br />
+	I have been hired to find security vulnerabilities in this web application so that passengers' and drivers' sensitive information are not able to be stolen and so that the web applicatio's features are not able to be altered by an attack.</p>
 
-	<h1>Methodology</h1>
-	<p></p>
+	<h1>2. Methodology</h1>
+	<p>Firstly, I black box tested the web application. In other words, I attempted to hack the web app without examining the source code. I started my black box testing by attempting a cross-site scripting attack and was successfully able to send a script to the web app by using the curl command to send user information to the web app. Then, while still black-box testing, I performed a successful injection attack by accessing the GET /vehicle.json route. Then, I examined the source code itself in order to see if there were other secutiry vulnerables. While examining the source code, I noticed that there were no authentication measures when sending data to the POST /submit route.</p>
 
-	<h1>Abstract of Findings</h1>
-	<p></p>
+	<h1>3. Abstract of Findings</h1>
+	<p>A security weakness was located using cross-site scripting, in which when sending data to the web application, javascript code was able to be sent and stored. Thus, when retrieving that data from the web application, the javascript code was executed. A second vulnerability was found by an injection attack, in which I supplied an input to a URL witha characters that allowed me to access data that I wasn't supposed to have access to. A third vulnerability was that there were no authentication measures when a user wants to "login" with their username and location. Thus anyone could "login" to a different account and set the location to be incorrect.</p>
+	
 
-	<h1>Issues Found</h1>
-	<p></p>
+	<h1>4. Issues Found</h1>
+	<p>1. Issue: Cross-site scripting<br />
+	      Location: I did not search for the vulnerability in the source code, because I was black box testing, however the vulnerability occurs inside the /submit POST route when the request body was parsed and the data stored into the database.  <br />
+	      Severity: High, vulnerable to scripts being stored in the server's database and
+	      such scripts can retrieve people's sensitive information.		<br />
+	      Description: I found this vulnerability by "black box" testing: without having read the source code, I attempted to perform a XSS attack.<br />
+	      Proof of Vulnerability: <img src="./XSSexample.png" height="400" width="800"/><br />
+	      Resolution: This issue can be solved by stripping user input of key characters such as "<" and ">" in order to prevent a script being sent to the web application.<br /><br />
+	   2. Issue: Database Injection<br />
+	      Location: I did not search for the vulnerability in the source code, because I was black box testing, however the vulnerability occurs inside the GET /vehicles.json route.  <br />
+	      Severity: High, this type of attack allows the hacker to retrieve all the records of the database collection.<br />
+	      Description: I found this vulnerability by "black box" testing: without having read the source code, I attempted to perform an injection attack.<br />
+	      Proof of Vulnerability: <img src="./injection_attack.png"/> <br />
+	      Resolution: A way to prevent an injection attack is by avoiding dynamic queries and instead use prepared parametrized queries by actually writing the SQL code. Example of dynamic query that is vulnerable to injection attack: db.collection('vehicles', function (error, coll) {                          
+106         coll.find( {"username": v_username } )...etc.<br /><br />
+	   3. Issue: No Authentication <br />
+	   	  Location: Having searched the source code, I noticed that no authentication measures were used in the POST /submit route. <br />
+	   	  Severity: High, with no authentication in place, attackers are able to assume the identity of others and thus potentially acquire sensitive information. <br />
+	   	  Description: I noticed that no authentication measures were used in the POST /submit route. <br />
+	   	  Proof of Vulnerability: Even though my username is not ilFrXqLz, I was able to login as them and update their latitude and longitude.<img src="./authentication_attack.png" height="100" width="800"/> <br />
+	   	  Resolution: Provide a layer of verification to the POST /submit route by having a user enter a password.<br /><br />
 
-	<h1>Conclusion</h1>
-	<p></p>
+	</p>
 
-	<h1>References</h1>
-	<p></p>
+	<h1>5. Conclusion</h1>
+	<p>Many steps must be done in order to secure this web application: user input must be stripped of characters like '<' and '>' so that a script is not sent to the web app, the dynamic queries of MongoDB must be replaced with prepared parametrized queries so that a user cannot trick the database, and finally, authentication needs to be required in order for a user to "login" to their account. </p>
+
+	<h1>6. References</h1>
+	<p>https://www.owasp.org/index.php/SQL_Injection_Prevention_Cheat_Sheet<br />
+	https://www.owasp.org/index.php/Authentication_Cheat_Sheet</p>
+
 
 </body>
 
